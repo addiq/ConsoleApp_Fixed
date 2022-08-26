@@ -2,10 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
-    //using System.Text;
+    using System.Text;
     using System.IO;
     using System.Linq;
-    //using System.Threading.Tasks;
+    using System.Threading.Tasks;
 
     public class DataReader
     {
@@ -21,10 +21,12 @@
             while (!streamReader.EndOfStream)
             {
                 var line = streamReader.ReadLine();
-                importedLines.Add(line);
+                if (!String.IsNullOrEmpty(line)) //check if line is null or empty, IF yes, than exit if
+                { 
+                    importedLines.Add(line);
+                }
             }
-
-            for (int i = 0; i <= importedLines.Count; i++)
+            for (int i = 0; i <= importedLines.Count-1; i++) // -1 added
             {
                 var importedLine = importedLines[i];
                 var values = importedLine.Split(';');
@@ -38,15 +40,21 @@
                 importedObject.IsNullable = values[6];
                 ((List<ImportedObject>)ImportedObjects).Add(importedObject);
             }
+                
+            
 
             // clear and correct imported data
             foreach (var importedObject in ImportedObjects)
             {
-                importedObject.Type = importedObject.Type.Trim().Replace(" ", "").Replace(Environment.NewLine, "").ToUpper();
-                importedObject.Name = importedObject.Name.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
-                importedObject.Schema = importedObject.Schema.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
-                importedObject.ParentName = importedObject.ParentName.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
-                importedObject.ParentType = importedObject.ParentType.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
+                if (importedObject.Type != null) //check if line of imported objects is NOT empty
+                {
+                    importedObject.Type = importedObject.Type.Trim().Replace(" ", "").Replace(Environment.NewLine, "").ToUpper();
+                    importedObject.Name = importedObject.Name.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
+                    importedObject.Schema = importedObject.Schema.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
+                    importedObject.ParentName = importedObject.ParentName.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
+                    importedObject.ParentType = importedObject.ParentType.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
+                }
+
             }
 
             // assign number of children
@@ -74,20 +82,26 @@
                     // print all database's tables
                     foreach (var table in ImportedObjects)
                     {
-                        if (table.ParentType.ToUpper() == database.Type)
+                        if (!string.IsNullOrEmpty(table.ParentType))
                         {
-                            if (table.ParentName == database.Name)
+                            if (table.ParentType.ToUpper() == database.Type)
                             {
-                                Console.WriteLine($"\tTable '{table.Schema}.{table.Name}' ({table.NumberOfChildren} columns)");
-
-                                // print all table's columns
-                                foreach (var column in ImportedObjects)
+                                if (table.ParentName == database.Name)
                                 {
-                                    if (column.ParentType.ToUpper() == table.Type)
+                                    Console.WriteLine($"\tTable '{table.Schema}.{table.Name}' ({table.NumberOfChildren} columns)");
+
+                                    // print all table's columns
+                                    foreach (var column in ImportedObjects)
                                     {
-                                        if (column.ParentName == table.Name)
+                                        if (!string.IsNullOrEmpty(column.ParentType))
                                         {
-                                            Console.WriteLine($"\t\tColumn '{column.Name}' with {column.DataType} data type {(column.IsNullable == "1" ? "accepts nulls" : "with no nulls")}");
+                                            if (column.ParentType.ToUpper() == table.Type)
+                                            {
+                                                if (column.ParentName == table.Name)
+                                                {
+                                                    Console.WriteLine($"\t\tColumn '{column.Name}' with {column.DataType} data type {(column.IsNullable == "1" ? "accepts nulls" : "with no nulls")}");
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -98,33 +112,59 @@
             }
 
             Console.ReadLine();
+
         }
     }
 
     class ImportedObject : ImportedObjectBaseClass
     {
-        public string Name
+        public string _Name
         {
-            get;
-            set;
+            get; // { return name; }
+            set; // { name = Name; }
         }
-        public string Schema;
+        public string Schema
+        {
+            get; // { return schema; }
+            set; // { schema = Schema; }
+        }
+        public string ParentName
+        {
+            get; // { return parentName; }
+            set; // { parentName = ParentName; }
+        }
 
-        public string ParentName;
         public string ParentType
         {
-            get; set;
+            get; // { return parentType; }
+            set; // { parentType = ParentType; }
         }
 
-        public string DataType { get; set; }
-        public string IsNullable { get; set; }
+        public string DataType 
+        {
+            get; // { return dataType; }
+            set; // { dataType = DataType; }
+        }
+        public string IsNullable
+        {
+            get;// { return isNullable; }  
+            set;// { isNullable = IsNullable; }
+        }
+
 
         public double NumberOfChildren;
+        
+        //private string name;
+        //private string schema;
+        //private string parentName;
+        //private string parentType;
+        //private string dataType;
+        //private string isNullable;
     }
 
     class ImportedObjectBaseClass
     {
         public string Name { get; set; }
-        public string Type { get; set; }
+        public string Type;
     }
 }
