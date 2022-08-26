@@ -13,7 +13,6 @@
         {
             var reader = new DataReader();
             reader.ImportAndPrintData("data.csv"); //filename with double a at end.
-            Console.ReadKey();
         }
     }
 }

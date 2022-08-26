@@ -21,12 +21,12 @@
             while (!streamReader.EndOfStream)
             {
                 var line = streamReader.ReadLine();
-                if (!String.IsNullOrEmpty(line)) //check if line is null or empty, IF yes, than exit if
+                if (!String.IsNullOrEmpty(line)) //check if line is NOT NULL or empty
                 { 
                     importedLines.Add(line);
                 }
             }
-            for (int i = 0; i <= importedLines.Count-1; i++) // -1 added
+            for (int i = 0; i <= importedLines.Count-1; i++) //subtraction of -1 added 'cause count start from 0
             {
                 var importedLine = importedLines[i];
                 var values = importedLine.Split(';');
@@ -45,8 +45,8 @@
 
             // clear and correct imported data
             foreach (var importedObject in ImportedObjects)
-            {
-                if (importedObject.Type != null) //check if line of imported objects is NOT empty
+            {   
+                if (!String.IsNullOrEmpty(importedObject.Type)) //check if line of imported objects is NOT NULL or empty
                 {
                     importedObject.Type = importedObject.Type.Trim().Replace(" ", "").Replace(Environment.NewLine, "").ToUpper();
                     importedObject.Name = importedObject.Name.Trim().Replace(" ", "").Replace(Environment.NewLine, "");
@@ -82,7 +82,7 @@
                     // print all database's tables
                     foreach (var table in ImportedObjects)
                     {
-                        if (!string.IsNullOrEmpty(table.ParentType))
+                        if (!string.IsNullOrEmpty(table.ParentType)) //check if string is NOT NULL or empty
                         {
                             if (table.ParentType.ToUpper() == database.Type)
                             {
@@ -93,7 +93,7 @@
                                     // print all table's columns
                                     foreach (var column in ImportedObjects)
                                     {
-                                        if (!string.IsNullOrEmpty(column.ParentType))
+                                        if (!string.IsNullOrEmpty(column.ParentType)) // check if string is NOT NULL or empty
                                         {
                                             if (column.ParentType.ToUpper() == table.Type)
                                             {
@@ -120,46 +120,40 @@
     {
         public string _Name
         {
-            get; // { return name; }
-            set; // { name = Name; }
+            get;
+            set;
         }
         public string Schema
         {
-            get; // { return schema; }
-            set; // { schema = Schema; }
+            get;
+            set;
         }
         public string ParentName
         {
-            get; // { return parentName; }
-            set; // { parentName = ParentName; }
+            get;
+            set;
         }
 
         public string ParentType
         {
-            get; // { return parentType; }
-            set; // { parentType = ParentType; }
+            get;
+            set; 
         }
 
         public string DataType 
         {
-            get; // { return dataType; }
-            set; // { dataType = DataType; }
+            get;
+            set; 
         }
         public string IsNullable
         {
-            get;// { return isNullable; }  
-            set;// { isNullable = IsNullable; }
+            get;
+            set;
         }
 
 
         public double NumberOfChildren;
         
-        //private string name;
-        //private string schema;
-        //private string parentName;
-        //private string parentType;
-        //private string dataType;
-        //private string isNullable;
     }
 
     class ImportedObjectBaseClass
